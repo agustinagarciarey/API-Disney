@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "cross-env NODE_ENV=dev  nodemon src/index.js"
   },
   "keywords": [],
   "author": "",

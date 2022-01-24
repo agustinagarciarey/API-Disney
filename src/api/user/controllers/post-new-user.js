@@ -6,6 +6,7 @@ const Validator = require('../../../utils/validator');
 //const SendTemplate = require('../../../utils/sendMail');
 const { PasswordReg } = require('../../../utils/reg-exp');
 const { User } = require('../../../db');
+const { createToken } = require('../../../utils/token');
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -39,9 +40,10 @@ const CreateUser = async (req, res) => {
                 const sending = await SendTemplate(user.mail, "Control Stock Super Mami - Bienvenida", "sendEmail", { principalInfo: "¡Bienvenido al equipo de Super Mami!", secondaryInfo: `Su legajo es ${user.id}. Su contraseña es ${request.data.password}` });
                 if (sending.error) return new ErrorModel(535, sending.error, "Error en el envío de email").send(res);
         */
-        //return res.status(200).send({ message: "Usuario cargado con éxito" });
-        return res.status(200).send(user);
+        //return res.status(200).send({ message: "Usuario cargado con éxito" })
 
+        const token = createToken(user.id);
+        return res.status(200).send({ token: token });
 
     } catch (err) {
         return new ErrorModel().newInternalServerError(err.message).send(res);
