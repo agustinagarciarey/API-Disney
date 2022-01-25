@@ -1,0 +1,141 @@
+openapi: 3.0.1
+info:
+  title: API Disney
+  version: 1.0.0
+servers:
+  - url: "http://localhost:3000"
+    description: Local Server
+
+tags:
+  - name: User
+    description: User handler
+  - name: Film
+    description: Film handler
+  - name: Character
+    description: Character handler
+
+paths:
+
+  /user/signup:
+    post:
+      tags:
+        - User
+      summary: Signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodySignupPost"
+        required: true
+      responses:
+        200:
+          description: The user was created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: User token
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiJGdzZRbXc1WUZ6UXhWenJKcmVHSCIsImV4cCI6MTYzMTI4MjM2OH0.-T2ofAXiYNsHFmS3QTod8FjArlbSo8-A5snx_4rH3lE
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/ServerError"
+        535:
+          $ref: "#/components/responses/EmailError"
+
+
+  /user/login:
+    post:
+      tags:
+        - User
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyLoginPost"
+        required: true
+      responses:
+        200:
+          description: The user was logged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: User token
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiJGdzZRbXc1WUZ6UXhWenJKcmVHSCIsImV4cCI6MTYzMTI4MjM2OH0.-T2ofAXiYNsHFmS3QTod8FjArlbSo8-A5snx_4rH3lE
+
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+
+components:
+  securitySchemes:
+    userToken:
+      type: http
+      scheme: bearer
+      description: Example eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiJvU3BMU1RBb2JOZ0tibnZvSHpsUyIsImV4cCI6MTYzMjE3MTY3N30.Lvp-Nvo1jjk3CfO7usnPR5zX8GeXehNe5Zgx34npROE
+
+  responses:
+    Unauthorized:
+      description: Unauthorized user
+
+    NotFound:
+      description: Data not found
+
+    BadRequest:
+      description: Error in data type or incomplete required fields
+
+    ServerError:
+      description: Internal server error
+
+    EmailError:
+      description: Error sending email
+    
+
+
+  schemas:
+    BodySignupPost:
+      type: object
+      required:
+        - name
+        - surname
+        - mail
+        - password
+      properties:
+        name:
+          type: string
+          maximum: 50
+          minimum: 3
+          example: Agustina
+        surname:
+          type: string
+          example: García Rey
+        mail:
+          type: string
+          example: agus_garciarey@hotmail.com
+        password:
+          type: string
+          example: Disney123
+
+    BodyLoginPost:
+      type: object
+      required:
+        - mail
+        - password
+      properties:
+        mail:
+          type: string
+          example: agus.garciarey@gmail.com
+        password:
+          type: string
+          example: Disney123

@@ -7,8 +7,6 @@ const SendMail = require('../../../utils/send-mail');
 const { PasswordReg } = require('../../../utils/reg-exp');
 const { User } = require('../../../db');
 const { createToken } = require('../../../utils/token');
-//const sgMail = require('@sendgrid/mail');
-
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -27,7 +25,7 @@ const CreateUser = async (req, res) => {
                 mail: request.data.mail
             }
         });
-        if (user_exsists) return new ErrorModel().newBadRequest("El email del usuario ingresado ya existe en el sistema").send(res);
+        if (user_exsists) return new ErrorModel().newBadRequest("La cuenta de correo electrónico ya está registrada").send(res);
 
         const hashed_password = await Hash(req.body.password);
 
@@ -41,7 +39,7 @@ const CreateUser = async (req, res) => {
             const token = createToken(user.id);
             return res.status(200).send({ token: token });
         }).catch((err) => {
-            return new ErrorModel(535, "Authentication Failed Code", "Error en el envío de email").send(res);
+            return new ErrorModel(535,"Error en el envío de email", "Hubo problemas al intentar enviar el email de bienvenida").send(res);
         });
         
     } catch (err) {
