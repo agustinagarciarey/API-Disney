@@ -3,15 +3,17 @@ const { Hash } = require('../../../utils/hashing');
 const moment = require('moment');
 const yup = require('yup');
 const Validator = require('../../../utils/validator');
-//const SendTemplate = require('../../../utils/sendMail');
+const SendMail = require('../../../utils/send-mail');
 const { PasswordReg } = require('../../../utils/reg-exp');
 const { User } = require('../../../db');
 const { createToken } = require('../../../utils/token');
+//const sgMail = require('@sendgrid/mail');
+
 
 const schema = yup.object().shape({
     name: yup.string().required(),
     surname: yup.string().required(),
-    mail: yup.string().email().required().transform((dato) => dato.toLowerCase()),
+    mail: yup.string().required().transform((dato) => dato.toLowerCase()),
     password: yup.string().matches(PasswordReg, { message: "La contraseña debe tener mínimo 8 caracteres y máximo 12. Debe contener al menos una mayúscula, una minúscula y un número" }).required(),
 })
 
@@ -20,14 +22,12 @@ const CreateUser = async (req, res) => {
         const request = await Validator(req.body, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
-        console.log(request.data);
-
         const user_exsists = await User.findOne({
             where: {
                 mail: request.data.mail
             }
         });
-        if (user_exsists) return new ErrorModel().newBadRequest("El mail del usuario ingresado ya existe en el sistema").send(res);
+        if (user_exsists) return new ErrorModel().newBadRequest("El email del usuario ingresado ya existe en el sistema").send(res);
 
         const hashed_password = await Hash(req.body.password);
 
@@ -36,15 +36,14 @@ const CreateUser = async (req, res) => {
             createdAt: moment.now(),
             password: hashed_password
         });
-        /*
-                const sending = await SendTemplate(user.mail, "Control Stock Super Mami - Bienvenida", "sendEmail", { principalInfo: "¡Bienvenido al equipo de Super Mami!", secondaryInfo: `Su legajo es ${user.id}. Su contraseña es ${request.data.password}` });
-                if (sending.error) return new ErrorModel(535, sending.error, "Error en el envío de email").send(res);
-        */
-        //return res.status(200).send({ message: "Usuario cargado con éxito" })
 
-        const token = createToken(user.id);
-        return res.status(200).send({ token: token });
-
+        SendMail(user.mail, "Bienvenido a Disney", user.name).then(() => {
+            const token = createToken(user.id);
+            return res.status(200).send({ token: token });
+        }).catch((err) => {
+            return new ErrorModel(535, "Authentication Failed Code", "Error en el envío de email").send(res);
+        });
+        
     } catch (err) {
         return new ErrorModel().newInternalServerError(err.message).send(res);
     }

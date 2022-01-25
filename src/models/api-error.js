@@ -36,7 +36,7 @@ class ErrorModel {
     }
 
     print() {
-        if (process.env.ENV === "dev") {
+        if (process.env.NODE_ENV === "dev") {
             console.log(`
             * Error: ${this.status}
             * Cause: ${this.cause}

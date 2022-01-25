@@ -1,6 +1,7 @@
 const express = require('express');
 const LoginUser = require('./controllers/post-login');
 const CreateUser = require('./controllers/post-new-user');
+const sgMail = require('../../utils/sgMail')
 
 const router = express.Router();
 
