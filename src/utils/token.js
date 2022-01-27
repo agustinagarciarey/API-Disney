@@ -1,9 +1,10 @@
 const jwt = require('jwt-simple');
 const moment = require('moment');
+const ErrorModel = require('../models/api-error');
 
 const ALGHORITM = "HS256";
 
-const createToken = (user) => {
+const CreateToken = (user) => {
 	const payload = {
 		id: user.id,
 		createdAt: moment().unix(),
@@ -12,23 +13,19 @@ const createToken = (user) => {
 	return jwt.encode(payload, process.env.SECRET_TOKEN_USER_AUTH, ALGHORITM);
 }
 
-const checkToken = (req, res, next) => {
-	if(req.headers['user-token']) {
-		return res.json({ error: 'Falta token en cabecera'});
-	}
-	const userToken = req.headers['user-token'];
-	let payload = {};
-	try {
-		payload = jwt.decode(userToken, process.env.SECRET_TOKEN_USER_AUTH, false, ALGHORITM);
-	} catch (err) {
-		return res.json({ error: 'El token es incorrecto' });
-	}
-	if (payload.expiredAt < moment().unix()) {
-		return res.json({ error: 'El token ha expirado' });
-	}
+const CheckToken = (req, res, next) => {
+    if (!req.headers.authorization) return new ErrorModel().newUnauthorized("No hay token en la cabecera").send(res);
+    const token = req.headers.authorization.split(" ")[1];
+    try {
+        const payload = jwt.decode(token, process.env.SECRET_TOKEN_USER_AUTH, false, ALGHORITM);
+        if (payload.exp <= moment().unix()) return new ErrorModel().newUnauthorized("El token ha expirado").send(res);
+        res.locals.payload = payload;
+        return next();
+    } catch (err) {
+        return new ErrorModel().newUnauthorized("Token incorrecto").send(res)
+    }
 }
-
 module.exports = {
-    createToken,
-	checkToken,
+    CreateToken,
+	CheckToken,
 }

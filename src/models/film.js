@@ -1,14 +1,19 @@
 module.exports = (sequelize, type) => {
 	return sequelize.define('film', {
 		id: {
-			type: type.INTEGER,
+			type: type.UUID,
 			primaryKey: true,
-			autoincrement: true
+			autoIncrement: true 
 		},
 		title: {
 			type: type.STRING(80),
 			allowNull: false,
 			required: true
+		},
+		image: {
+			type: type.STRING(250),
+			allowNull: true,
+			required: false
 		},
 		year: {
 			type: type.INTEGER,
@@ -17,7 +22,7 @@ module.exports = (sequelize, type) => {
 		},
 		rating: {
 			type: type.INTEGER,
-			defaultValue:0,
+			defaultValue: 0,
 		},
 		genre_id: {
 			type: type.INTEGER,

@@ -1,9 +1,9 @@
 module.exports = (sequelize, type) => {
 	return sequelize.define('character', {
 		id: {
-			type: type.INTEGER,
+			type: type.UUID,
 			primaryKey: true,
-			autoincrement: true
+			autoIncrement: true 
 		},
 		name: {
 			type: type.STRING(50),

@@ -1,7 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+//const path = require('path');
 const userRoute = require('./api/user/index');
+const characterRoute = require('./api/character/index')
+const filmRoute = require('./api/film/index')
 
 const app = express();
 
@@ -17,11 +20,13 @@ app.use(cors({
 
 
 //routes
-app.use('/user', userRoute);
-/*
-app.use('/film', filmRoute);
-app.use('/character', characterRoute);
-*/
+app.use('/users', userRoute);
+app.use('/films', filmRoute);
+app.use('/characters', characterRoute);
+
+//imgs
+//app.use('/uploads', express.static(path.resolve('uploads')));
+
 
 //starting the server
 app.listen(process.env.PORT, () =>{

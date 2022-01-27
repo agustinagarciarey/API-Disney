@@ -1,12 +1,11 @@
 const ErrorModel = require('../../../models/api-error');
 const { Hash } = require('../../../utils/hashing');
-const moment = require('moment');
 const yup = require('yup');
 const Validator = require('../../../utils/validator');
 const SendMail = require('../../../utils/send-mail');
 const { PasswordReg } = require('../../../utils/reg-exp');
 const { User } = require('../../../db');
-const { createToken } = require('../../../utils/token');
+const { CreateToken } = require('../../../utils/token');
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -31,12 +30,11 @@ const CreateUser = async (req, res) => {
 
         const user = await User.create({
             ...req.body,
-            createdAt: moment.now(),
             password: hashed_password
         });
 
         SendMail(user.mail, "Bienvenido a Disney", user.name).then(() => {
-            const token = createToken(user.id);
+            const token = CreateToken(user.id);
             return res.status(200).send({ token: token });
         }).catch((err) => {
             return new ErrorModel(535,"Error en el envío de email", "Hubo problemas al intentar enviar el email de bienvenida").send(res);

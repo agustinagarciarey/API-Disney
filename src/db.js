@@ -25,6 +25,8 @@ Film.belongsTo(Genre);
 sequelize.sync({ force: false })
     .then(() => {
         console.log('Tablas sincronizadas')
+    }).catch(() => {
+        console.log('Error al sincronizar tablas')
     });
 
 

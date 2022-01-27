@@ -1,4 +1,4 @@
-const { createToken } = require('../../../utils/token');
+const { CreateToken } = require('../../../utils/token');
 const ErrorModel = require('../../../models/api-error');
 const { Verify } = require('../../../utils/hashing');
 const yup = require("yup");
@@ -27,7 +27,7 @@ const LoginUser = async (req, res) => {
         const hashed_password = await Verify(req.body.password, user.password);
         if (!hashed_password) return new ErrorModel().newBadRequest("Email o contraseña incorrectos").send(res);
 
-        const token = createToken(user.id);
+        const token = CreateToken(user.id);
         return res.status(200).send({ token: token });
 
     } catch (err) {
