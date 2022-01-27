@@ -9,11 +9,11 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     dialect: process.env.DB_CONNECTION
 });
 
-
+const Genre = GenreModel(sequelize, Sequelize);
 const Film = FilmModel(sequelize, Sequelize);
 const User = UserModel(sequelize, Sequelize);
 const Character = CharacterModel(sequelize, Sequelize);
-const Genre = GenreModel(sequelize, Sequelize);
+
 
 // associations
 Character.belongsToMany(Film, { through: "characters_films" })

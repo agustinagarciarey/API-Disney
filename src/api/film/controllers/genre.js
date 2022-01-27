@@ -8,7 +8,7 @@ const CreateFilm = async (req, res) => {
 
         await Genre.create({
             ...req.body,
-            image: req.file.path,
+            //image: req.file.path,
         });
 
         return res.status(200).send({ message: "Género creado con éxito" });

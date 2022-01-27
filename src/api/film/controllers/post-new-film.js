@@ -23,7 +23,6 @@ const CreateFilm = async (req, res) => {
         const request = await Validator(req.body, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
-        console.log(request.data)
         const film_exsists = await Film.findOne({
             where: {
                 title: request.data.title
@@ -31,36 +30,36 @@ const CreateFilm = async (req, res) => {
         });
         if (film_exsists) return new ErrorModel().newBadRequest("La película ya ha sido registrada anteriormente").send(res);
 
-        const genre_exsists = await Genre.findOne({
+        const genre = await Genre.findOne({
             where: {
                 name: request.data.genre
             }
         });
-        if (!genre_exsists) return new ErrorModel().newBadRequest(`El género ${request.data.genre} no existe en el sistema`).send(res);
+        if (!Genre) return new ErrorModel().newBadRequest(`El género ${request.data.genre} no existe en el sistema`).send(res);
 
         let characters = [];
-        for(const f of request.data.characters){
-            const character_exsists = await Character.findOne({
+        for(const c of request.data.characters){
+            const character = await Character.findOne({
                 where: {
                     name: c.name
                 }
             });
-            if (!character_exsists) return new ErrorModel().newBadRequest(`El personaje ${c.name} no ha sido creado todavía. Cree primero el personaje para poder asociarlo a la película`).send(res);
-            characters.add(c);
+            if (!character) return new ErrorModel().newBadRequest(`El personaje ${c.name} no ha sido creado todavía. Cree primero el personaje para poder asociarlo a la película`).send(res);
+            characters.push(character);
         }
 
-        console.log(req.body);
-        delete req.body.fims;
-        console.log(req.body);
+        delete req.body.characters;
 
         const film = await Film.create({
             ...req.body,
-            image: req.file.path,
+            genre_id : genre.id
+            //image: req.file.path,
         });
 
-        characters.forEach(c => {
-            film.addCharacter(c)
-        });
+        
+        for(const c of characters){
+            await film.addCharacter(c.id);
+        }
 
         return res.status(200).send({ message: "Película creada con éxito" });
 

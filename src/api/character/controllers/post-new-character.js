@@ -23,8 +23,6 @@ const CreateCharacter = async (req, res) => {
         const request = await Validator(req.body, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
-
-        console.log(request.data)
         const character_exsists = await Character.findOne({
             where: {
                 name: request.data.name
@@ -37,23 +35,18 @@ const CreateCharacter = async (req, res) => {
         if (request.data.films) {
             for (const f of request.data.films) {
 
-                console.log(f);
-
-                const film_exsists = await Film.findOne({
+                const film = await Film.findOne({
                     where: {
                         title: f.title
                     }
                 });
-                if (!film_exsists) return new ErrorModel().newBadRequest(`La película ${f.title} no ha sido creada todavía. Cree primero la película para poder asociarla a este personaje`).send(res);
-                films.add(f);
+                if (!film) return new ErrorModel().newBadRequest(`La película ${f.title} no ha sido creada todavía. Cree primero la película para poder asociarla a este personaje`).send(res);
+                films.push(film);
             }
-            console.log("Las películas son: " + films)
         }
 
 
-        console.log(req.body);
         delete req.body.films;
-        console.log(req.body);
 
         const character = await Character.create({
             ...req.body,
@@ -61,9 +54,9 @@ const CreateCharacter = async (req, res) => {
             image: req.file.path,
         });
 
-        films.forEach(f => {
-            character.addFilm(f)
-        });
+        for(const f of films){
+            await character.addFilm(f.id);
+        }
 
         return res.status(200).send({ message: "Personaje creado con éxito" });
 
