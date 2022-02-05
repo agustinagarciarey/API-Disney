@@ -16,7 +16,7 @@ tags:
 
 paths:
 
-  /user/signup:
+  /users/signup:
     post:
       tags:
         - User
@@ -47,7 +47,7 @@ paths:
           $ref: "#/components/responses/EmailError"
 
 
-  /user/login:
+  /users/login:
     post:
       tags:
         - User
@@ -76,6 +76,72 @@ paths:
         500:
           $ref: "#/components/responses/ServerError"
 
+  /movies/add:
+    post:
+      tags:
+        - Film
+      summary: Create film
+      security:
+        - userToken: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BodyCreateFilmPost"
+            encoding: 
+                image: 
+                  contentType: image/png, image/jpeg, image/jpg
+        required: true
+      responses:
+        200:
+          description: The film was created successfully
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/ServerError"
+          
+  /movies/:
+    get:
+      tags:
+        - Film
+      summary: Get films
+      security:
+        - userToken: []
+      parameters:
+      - name: name
+        in: query
+        required: false
+        description: Nombre de la película o serie
+        example: Star Wars Episode III Revenge of the Sith
+        schema:
+          type: string
+      - name: genre
+        in: query
+        required: false
+        description: Género de la película o serie
+        example: 1
+        schema:
+          type: string
+      - name: order
+        in: query
+        required: false
+        description: Orden para mostrar los datos según fecha de creación
+        example: ASC
+        schema:
+          type: string
+      responses:
+        200:
+          description: (OK) Películas y series obtenidas con écito
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/ServerError"
+  
 
 
 components:
@@ -83,7 +149,7 @@ components:
     userToken:
       type: http
       scheme: bearer
-      description: Example eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiJvU3BMU1RBb2JOZ0tibnZvSHpsUyIsImV4cCI6MTYzMjE3MTY3N30.Lvp-Nvo1jjk3CfO7usnPR5zX8GeXehNe5Zgx34npROE
+      description: To obtain the token please login
 
   responses:
     Unauthorized:
@@ -122,7 +188,7 @@ components:
           example: García Rey
         mail:
           type: string
-          example: agus_garciarey@hotmail.com
+          example: agus.garciarey@gmail.com
         password:
           type: string
           example: Disney123
@@ -139,3 +205,73 @@ components:
         password:
           type: string
           example: Disney123
+  
+    BodyCreateFilmPost:
+      type: object
+      required:
+        - title
+        - image
+        - year
+        - rating
+        - genreId
+        - characters
+      properties:
+        title:
+          type: string
+          maximum: 80
+          example: Star Wars Episode III Revenge of the Sith
+        image:
+            type: string
+            format: binary
+        year:
+          type: number
+          example: 2005
+        rating:
+          type: number
+          example: 4.7
+        genreId:
+          type: number
+          description: 1.Ciencia ficción 2.Drama 3.Comedia
+          example: 1
+        characters:
+          type: array
+          description: Enter characters already created. If they still do not exist, leave this field empty.
+          items:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+          example:
+            - name: Anakin Skywalker
+            - name: Chewbacca
+            
+    ResponseGetFilm:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        image:
+          type: string
+          format: binary
+        family:
+          type: number
+        year:
+          type: number
+        rating:
+          type: number
+        genre:
+          type: string
+        created_at:
+          type: number
+        updated_at:
+          type: number
+          
+    ResponseGetFilms:
+      type: array
+      items:
+          $ref: '#/components/schemas/ResponseGetFilm'
+          
