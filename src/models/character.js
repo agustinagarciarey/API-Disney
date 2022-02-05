@@ -4,7 +4,7 @@ module.exports = (sequelize, type) => {
 			type: type.INTEGER,
 			autoIncrement: true,
 			primaryKey: true,
-		
+
 		},
 		name: {
 			type: type.STRING(50),
@@ -21,8 +21,8 @@ module.exports = (sequelize, type) => {
 			allowNull: false,
 			required: true
 		},
-        weight: {
-			type: type.DECIMAL(5,2),
+		weight: {
+			type: type.DECIMAL(5, 2),
 			allowNull: false,
 			required: true
 		},
@@ -31,8 +31,14 @@ module.exports = (sequelize, type) => {
 			allowNull: false,
 			required: true
 		},
+		createdAt: {
+			type: type.BIGINT,
+		},
+		updatedAt: {
+			type: type.BIGINT,
+		}
 	},
 		{
-			underscored: true
+			timestamps: false,
 		});
 }

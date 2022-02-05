@@ -16,8 +16,8 @@ const Character = CharacterModel(sequelize, Sequelize);
 
 
 // associations
-Character.belongsToMany(Film, { through: "characters_films" })
-Film.belongsToMany(Character, { through: "characters_films" })
+Character.belongsToMany(Film, { through: "charactersFilms" })
+Film.belongsToMany(Character, { through: "charactersFilms" })
 Genre.hasMany(Film)
 Film.belongsTo(Genre);
 

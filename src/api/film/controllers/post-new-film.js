@@ -4,19 +4,22 @@ const Validator = require('../../../utils/validator');
 const { Genre } = require('../../../db');
 const { Film } = require('../../../db');
 const { Character } = require('../../../db');
+const moment = require("moment");
 
 const schema = yup.object().shape({
     title: yup.string().required(),
     image: yup.mixed(),
     year: yup.number().required(),
     rating: yup.number().required(),
-    genre: yup.string().oneOf(["Acción", "Ciencia ficción", "Musical", "Drama", "Comedia"]),
+    //se asume que del lado del front-end el género se seleccionaría con un combobox por eso recibe un number
+    genreId: yup.number(),
+    //para variar se creará por nombre del personaje y no por el id
     characters: yup.array(
         yup.object({
             name: yup.string()
         })
-    ),
-})
+    )
+});
 
 const CreateFilm = async (req, res) => {
     try {
@@ -28,37 +31,40 @@ const CreateFilm = async (req, res) => {
                 title: request.data.title
             }
         });
-        if (film_exsists) return new ErrorModel().newBadRequest("La película ya ha sido registrada anteriormente").send(res);
+       //Se asume que puede haber películas con el mismo nombre
 
         const genre = await Genre.findOne({
             where: {
-                name: request.data.genre
+                id: request.data.genreId
             }
         });
-        if (!Genre) return new ErrorModel().newBadRequest(`El género ${request.data.genre} no existe en el sistema`).send(res);
+        if (!genre) return new ErrorModel().newBadRequest(`El género ${request.data.genreId} no existe en el sistema`).send(res);
 
         let characters = [];
-        for(const c of request.data.characters){
-            const character = await Character.findOne({
-                where: {
-                    name: c.name
-                }
-            });
-            if (!character) return new ErrorModel().newBadRequest(`El personaje ${c.name} no ha sido creado todavía. Cree primero el personaje para poder asociarlo a la película`).send(res);
-            characters.push(character);
-        }
+        if (request.data.hasOwnProperty('characters')) {
+            for (const c of request.data.characters) {
+                const character = await Character.findOne({
+                    where: {
+                        name: c.name
+                    }
+                });
+                if (!character) return new ErrorModel().newBadRequest(`El personaje ${c.name} no ha sido creado todavía. Cree primero el personaje para poder asociarlo a la película`).send(res);
+                characters.push(character);
+            }
 
-        delete req.body.characters;
+            delete req.body.characters;
+        }
 
         const film = await Film.create({
             ...req.body,
-            genre_id : genre.id
-            //image: req.file.path,
+            createdAt: moment.now(),
+            image: req.file.path,
         });
 
-        
-        for(const c of characters){
-            await film.addCharacter(c.id);
+        if (request.data.hasOwnProperty('characters')) {
+            for (const c of characters) {
+                await film.addCharacter(c.id);
+            }
         }
 
         return res.status(200).send({ message: "Película creada con éxito" });

@@ -4,7 +4,7 @@ module.exports = (sequelize, type) => {
 			type: type.INTEGER,
 			autoIncrement: true,
 			primaryKey: true,
-		
+
 		},
 		title: {
 			type: type.STRING(80),
@@ -22,16 +22,22 @@ module.exports = (sequelize, type) => {
 			required: true
 		},
 		rating: {
-			type: type.INTEGER,
+			type: type.FLOAT,
 			defaultValue: 0,
 		},
-		genre_id: {
+		genreId: {
 			type: type.INTEGER,
 			allowNull: false,
 			required: true
+		},
+		createdAt: {
+			type: type.BIGINT,
+		},
+		updatedAt: {
+			type: type.BIGINT,
 		}
 	},
 		{
-			underscored: true,
+			timestamps: false,
 		});
 }

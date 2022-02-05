@@ -21,7 +21,7 @@ app.use(cors({
 
 //routes
 app.use('/users', userRoute);
-app.use('/films', filmRoute);
+app.use('/movies', filmRoute);
 app.use('/characters', characterRoute);
 
 //imgs

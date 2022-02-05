@@ -6,6 +6,7 @@ const SendMail = require('../../../utils/send-mail');
 const { PasswordReg } = require('../../../utils/reg-exp');
 const { User } = require('../../../db');
 const { CreateToken } = require('../../../utils/token');
+const moment = require("moment");
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -30,10 +31,12 @@ const CreateUser = async (req, res) => {
 
         const user = await User.create({
             ...req.body,
+            createdAt: moment.now(),
             password: hashed_password
         });
 
-        SendMail(user.mail, "Bienvenido a Disney", user.name).then(() => {
+        //probablemente el primer mail llegue a spam
+        SendMail(user.mail, user.name).then(() => {
             const token = CreateToken(user.id);
             return res.status(200).send({ token: token });
         }).catch((err) => {

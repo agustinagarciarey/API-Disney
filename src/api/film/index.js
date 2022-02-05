@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('../../utils/upload-img');
 const { CheckToken } = require('../../utils/token');
 const CreateFilm = require('./controllers/post-new-film');
+const GetFilms = require('./controllers/get-films');
 
 const CreateGenre = require('./controllers/genre')
 
@@ -9,7 +10,7 @@ const router = express.Router();
 
 //AGREGAR TOKEN
 
-//router.get('/', );
+router.get('/', CheckToken, GetFilms );
 router.post('/add', CheckToken, multer.single('image'), CreateFilm);
 //router.put('/:id',);
 //router.delete('/:id',);

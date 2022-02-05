@@ -15,7 +15,6 @@ const schema = yup.object().shape({
             title: yup.string()
         })
     ),
-
 })
 
 const CreateCharacter = async (req, res) => {

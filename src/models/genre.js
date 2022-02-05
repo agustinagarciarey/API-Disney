@@ -4,7 +4,7 @@ module.exports = (sequelize, type) => {
 			type: type.INTEGER,
 			autoIncrement: true,
 			primaryKey: true,
-		
+
 		},
 		name: {
 			type: type.STRING(50),
@@ -16,8 +16,14 @@ module.exports = (sequelize, type) => {
 			allowNull: true,
 			required: false
 		},
+		createdAt: {
+			type: type.BIGINT,
+		},
+		updatedAt: {
+			type: type.BIGINT,
+		}
 	},
 		{
-			underscored: true
+			timestamps: false,
 		});
 }
