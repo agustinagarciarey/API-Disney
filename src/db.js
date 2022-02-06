@@ -3,6 +3,7 @@ const FilmModel = require('./models/film');
 const UserModel = require('./models/user');
 const CharacterModel = require('./models/character');
 const GenreModel = require('./models/genre');
+const CharactersFilmModel = require('./models/character-film');
 
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
@@ -13,6 +14,7 @@ const Genre = GenreModel(sequelize, Sequelize);
 const Film = FilmModel(sequelize, Sequelize);
 const User = UserModel(sequelize, Sequelize);
 const Character = CharacterModel(sequelize, Sequelize);
+const CharactersFilms = CharactersFilmModel(sequelize, Sequelize)
 
 
 // associations

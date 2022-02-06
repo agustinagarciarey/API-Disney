@@ -11,10 +11,15 @@ module.exports = (sequelize, type) => {
 			allowNull: false,
 			required: true
 		},
-		image: {
+		imageURL: {
 			type: type.STRING(250),
 			allowNull: true,
-			required: false
+			required: true
+		},
+		imagePublicId: {
+			type: type.STRING(50),
+			allowNull: true,
+			required: true
 		},
 		createdAt: {
 			type: type.BIGINT,

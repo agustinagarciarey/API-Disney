@@ -1,19 +1,16 @@
 const ErrorModel = require('../../../models/api-error');
 const yup = require('yup');
 const Validator = require('../../../utils/validator');
-const { Genre, Film, Character } = require('../../../db');
+const { Genre } = require('../../../db');
+const { Film } = require('../../../db');
+const { Character } = require('../../../db');
 const moment = require("moment");
-const fs = require('fs-extra');
-const cloudinary = require('cloudinary');
 
 const schema = yup.object().shape({
     title: yup.string().required(),
-    image: yup.mixed(),
     year: yup.number().required(),
     rating: yup.number().required(),
-    //se asume que del lado del front-end el género se seleccionaría con un combobox por eso recibe un number
     genreId: yup.number(),
-    //para variar se creará por nombre del personaje y no por el id
     characters: yup.array(
         yup.object({
             name: yup.string()
@@ -21,23 +18,21 @@ const schema = yup.object().shape({
     )
 });
 
-const CreateFilm = async (req, res) => {
+const UpdateFilm = async (req, res) => {
     try {
         const request = await Validator(req.body, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
-       //Se asume que puede haber películas con el mismo nombre
-
+        console.log(request.data);
+        
         const genre = await Genre.findOne({
             where: {
                 id: request.data.genreId
             }
         });
-        if (!genre) return new ErrorModel().newBadRequest(`El género no existe en el sistema`).send(res);
+        if (!genre) return new ErrorModel().newBadRequest(`El género ingresado no existe en el sistema`).send(res);
 
         let characters = [];
-        console.log(request.data.characters);
-        console.log(request.data.hasOwnProperty('characters'));
         if (request.data.hasOwnProperty('characters')) {
             for (const c of request.data.characters) {
                 const character = await Character.findOne({
@@ -52,29 +47,26 @@ const CreateFilm = async (req, res) => {
             delete req.body.characters;
         }
 
-        const result = await cloudinary.v2.uploader.upload(req.file.path);
-        
-        const film = await Film.create({
+        const film = await Film.update({
             ...req.body,
-            createdAt: moment.now(),
-            imageURL: result.url,
-            imagePublicId: result.public_id
+            updatedAt: moment.now(),
+        }, {
+            where: {id: req.params.id}
         });
 
-        await fs.unlink(req.file.path);
+        console.log(film);
 
         if (request.data.hasOwnProperty('characters')) {
             for (const c of characters) {
-                await film.addCharacter(c.id);
+                await film.setCharacter(c.id);
             }
         }
 
-
-        return res.status(200).send({ message: "Película creada con éxito" });
+        return res.status(200).send({ message: "Película modificada con éxito" });
 
     } catch (err) {
         return new ErrorModel().newInternalServerError(err.message).send(res);
     }
 };
 
-module.exports = CreateFilm;
+module.exports = UpdateFilm;

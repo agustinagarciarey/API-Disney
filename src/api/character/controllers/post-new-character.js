@@ -1,8 +1,10 @@
 const ErrorModel = require('../../../models/api-error');
 const yup = require('yup');
 const Validator = require('../../../utils/validator');
-const { Character } = require('../../../db');
-const { Film } = require('../../../db');
+const { Character, Film } = require('../../../db');
+const moment = require("moment");
+const fs = require('fs-extra');
+const cloudinary = require('cloudinary');
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -29,9 +31,10 @@ const CreateCharacter = async (req, res) => {
         });
         if (character_exsists) return new ErrorModel().newBadRequest("El personaje ya ha sido registrado anteriormente").send(res);
 
-
         let films = [];
-        if (request.data.films) {
+        console.log(request.data.films);
+        console.log(request.data.hasOwnProperty('films'));
+        if (request.data.hasOwnProperty('films')) {
             for (const f of request.data.films) {
 
                 const film = await Film.findOne({
@@ -44,17 +47,23 @@ const CreateCharacter = async (req, res) => {
             }
         }
 
-
         delete req.body.films;
+
+        const result = await cloudinary.v2.uploader.upload(req.file.path);
 
         const character = await Character.create({
             ...req.body,
-            id : 1,
-            image: req.file.path,
+            createdAt: moment.now(),
+            imageURL: result.url,
+            imagePublicId: result.public_id
         });
 
-        for(const f of films){
-            await character.addFilm(f.id);
+        await fs.unlink(req.file.path);
+
+        if (request.data.hasOwnProperty('films')) {
+            for (const f of films) {
+                await character.addFilm(f.id);
+            }
         }
 
         return res.status(200).send({ message: "Personaje creado con éxito" });

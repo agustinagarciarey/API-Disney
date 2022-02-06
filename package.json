@@ -16,6 +16,7 @@
   "dependencies": {
     "@sendgrid/mail": "^7.6.0",
     "bcrypt": "^5.0.1",
+    "cloudinary": "^1.28.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "express": "^4.17.2",

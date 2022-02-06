@@ -87,7 +87,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/BodyCreateFilmPost"
+              $ref: "#/components/schemas/BodyCreateFilm"
             encoding: 
                 image: 
                   contentType: image/png, image/jpeg, image/jpg
@@ -97,6 +97,8 @@ paths:
           description: The film was created successfully
         400:
           $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
         500:
           $ref: "#/components/responses/ServerError"
           
@@ -131,19 +133,145 @@ paths:
           type: string
       responses:
         200:
-          description: (OK) Películas y series obtenidas con écito
+          description: (OK) Películas y series obtenidas con éxito
           content:
-            image/png:
+            application/json:
               schema:
-                type: string
-                format: binary
+                $ref: "#/components/schemas/ResponseGetFilms"
         400:
           $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
         500:
           $ref: "#/components/responses/ServerError"
-  
-
-
+          
+  /movies/{id}:
+    get:
+      tags:
+        - Film
+      summary: Get film
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Movie ID
+        example: 1
+        schema:
+          type: string
+      responses:
+        200:
+          description: (OK) Película o serie obtenida con éxito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseGetFilm"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+    
+    put:
+      tags:
+        - Film
+      summary: Update film
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Movie ID
+        example: 1
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyUpdateFilm"
+        required: true
+      responses:
+        200:
+          description: (OK) Película o serie modificada con éxito
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+    
+    delete:
+      tags:
+        - Film
+      summary: Delete film
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Movie ID
+        example: 1
+        schema:
+          type: string
+      responses:
+        200:
+          description: (OK) Película o serie eliminada con éxito
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+          
+  /movies/image/{id}:
+    put:
+      tags:
+        - Film
+      summary: Update image film
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Movie ID
+        example: 1
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+            encoding: 
+                image: 
+                  contentType: image/png, image/jpeg, image/jpg
+        required: true
+      responses:
+        200:
+          description: (OK) Película o serie modificada con éxito
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+          
 components:
   securitySchemes:
     userToken:
@@ -206,7 +334,7 @@ components:
           type: string
           example: Disney123
   
-    BodyCreateFilmPost:
+    BodyCreateFilm:
       type: object
       required:
         - title
@@ -247,6 +375,43 @@ components:
             - name: Anakin Skywalker
             - name: Chewbacca
             
+    BodyUpdateFilm:
+      type: object
+      required:
+        - title
+        - year
+        - rating
+        - genreId
+        - characters
+      properties:
+        title:
+          type: string
+          maximum: 80
+          example: Star Wars Episode III Revenge of the Sith
+        year:
+          type: number
+          example: 2005
+        rating:
+          type: number
+          example: 4.7
+        genreId:
+          type: number
+          description: 1.Ciencia ficción 2.Drama 3.Comedia
+          example: 1
+        characters:
+          type: array
+          description: Enter characters already created. If they still do not exist, leave this field empty.
+          items:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+          example:
+            - name: Anakin Skywalker
+            - name: Chewbacca
+            
     ResponseGetFilm:
       type: object
       properties:
@@ -254,9 +419,11 @@ components:
           type: string
         title:
           type: string
-        image:
+        imageURL:
           type: string
           format: binary
+        imagePublicId:
+          type: string
         family:
           type: number
         year:
@@ -265,10 +432,17 @@ components:
           type: number
         genre:
           type: string
-        created_at:
-          type: number
-        updated_at:
-          type: number
+        characters:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
           
     ResponseGetFilms:
       type: array

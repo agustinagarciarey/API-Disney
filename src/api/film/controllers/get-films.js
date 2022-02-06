@@ -3,6 +3,7 @@ const yup = require('yup');
 const Validator = require('../../../utils/validator');
 const { Film } = require('../../../db');
 const Sequelize = require('sequelize');
+const moment = require('moment');
 
 const schema = yup.object().shape({
     name: yup.string(),
@@ -62,7 +63,16 @@ const CreateFilm = async (req, res) => {
             });
         }
 
-        return res.status(200).send(films);
+        const response = films.map(f => {
+            f = {
+                ...f.dataValues,
+                createdAt: moment(f.createdAt).format('DD/MM/YYYY'),
+                updatedAt: moment(f.createdAt).format('DD/MM/YYYY')
+            }
+            return f;
+        })
+
+        return res.status(200).send(response);
 
     } catch (err) {
         return new ErrorModel().newInternalServerError(err.message).send(res);

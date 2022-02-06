@@ -5,7 +5,7 @@ const cors = require('cors');
 const userRoute = require('./api/user/index');
 const characterRoute = require('./api/character/index')
 const filmRoute = require('./api/film/index')
-
+const cloudinary = require('cloudinary');
 const app = express();
 
 require('./db');
@@ -18,18 +18,20 @@ app.use(cors({
 	allowedHeaders: "*"
 }));
 
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+
+});
 
 //routes
 app.use('/users', userRoute);
 app.use('/movies', filmRoute);
 app.use('/characters', characterRoute);
 
-//imgs
-//app.use('/uploads', express.static(path.resolve('uploads')));
-
-
 //starting the server
-app.listen(process.env.PORT, () =>{
+app.listen(process.env.PORT || 3000, () =>{
 	console.log('Corriendo en el puerto ' + process.env.PORT);
 });
 
