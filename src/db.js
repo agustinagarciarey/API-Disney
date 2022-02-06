@@ -24,7 +24,7 @@ Genre.hasMany(Film)
 Film.belongsTo(Genre);
 
 // synchronizing db
-sequelize.sync({ force: false })
+sequelize.sync({ force: false})
     .then(() => {
         console.log('Tablas sincronizadas')
     }).catch(() => {
@@ -36,5 +36,6 @@ module.exports = {
     Film,
     User,
     Character,
-    Genre
+    Genre,
+    CharactersFilms 
 }

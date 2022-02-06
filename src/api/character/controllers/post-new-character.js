@@ -16,7 +16,7 @@ const schema = yup.object().shape({
         yup.object({
             title: yup.string()
         })
-    ),
+    ).nullable(),
 })
 
 const CreateCharacter = async (req, res) => {
@@ -32,9 +32,7 @@ const CreateCharacter = async (req, res) => {
         if (character_exsists) return new ErrorModel().newBadRequest("El personaje ya ha sido registrado anteriormente").send(res);
 
         let films = [];
-        console.log(request.data.films);
-        console.log(request.data.hasOwnProperty('films'));
-        if (request.data.hasOwnProperty('films')) {
+        if (request.data.films != null) {
             for (const f of request.data.films) {
 
                 const film = await Film.findOne({
@@ -42,6 +40,7 @@ const CreateCharacter = async (req, res) => {
                         title: f.title
                     }
                 });
+                console.log(film)
                 if (!film) return new ErrorModel().newBadRequest(`La película ${f.title} no ha sido creada todavía. Cree primero la película para poder asociarla a este personaje`).send(res);
                 films.push(film);
             }
@@ -60,7 +59,7 @@ const CreateCharacter = async (req, res) => {
 
         await fs.unlink(req.file.path);
 
-        if (request.data.hasOwnProperty('films')) {
+        if (request.data.films != null) {
             for (const f of films) {
                 await character.addFilm(f.id);
             }

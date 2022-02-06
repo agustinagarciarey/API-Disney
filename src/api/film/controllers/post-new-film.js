@@ -18,7 +18,7 @@ const schema = yup.object().shape({
         yup.object({
             name: yup.string()
         })
-    )
+    ).nullable()
 });
 
 const CreateFilm = async (req, res) => {
@@ -36,9 +36,14 @@ const CreateFilm = async (req, res) => {
         if (!genre) return new ErrorModel().newBadRequest(`El género no existe en el sistema`).send(res);
 
         let characters = [];
-        console.log(request.data.characters);
-        console.log(request.data.hasOwnProperty('characters'));
-        if (request.data.hasOwnProperty('characters')) {
+        console.log(request.data)
+        console.log(request.data.characters)
+        if(request.data.characters == null) {
+            console.log("es nulo")
+        } else {
+            console.log("no es nulo")
+        }
+        if (request.data.characters != null) {
             for (const c of request.data.characters) {
                 const character = await Character.findOne({
                     where: {
@@ -63,7 +68,7 @@ const CreateFilm = async (req, res) => {
 
         await fs.unlink(req.file.path);
 
-        if (request.data.hasOwnProperty('characters')) {
+        if (request.data.characters != null) {
             for (const c of characters) {
                 await film.addCharacter(c.id);
             }

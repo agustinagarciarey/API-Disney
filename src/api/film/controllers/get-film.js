@@ -21,28 +21,21 @@ const GetFilm = async (req, res) => {
                 id: film.genreId
             }
         });
-
-        let characters = ["Anakin", "Chwbacca"]
-        /*
-        characters": [
-    {
-      "name": "string"
-    }
-  ],
-        film.Characters.forEach(c => {
-            const character = await Character.findeOne({
+        
+        let characters = []
+        for (const f of film.characters) {
+            const character = await Character.findOne({
                 where: {
-                    id: c.id
+                    id: f.id
                 }
             })
             characters.push(character.name);
-        })*/
+        }
 
-        //como pide algo bien detallado se optó por mostrar nombre del género y de los personajes (en vez de sus id)
-        //como así también la fecha de creación y modificación en formato  DD/MM/YYYY
+        //se optó por mostrar nombre del género y de los personajes
         const response = {
             ...film.dataValues,
-            characters: characters,
+            characters,
             genre: genre.name,
             createdAt: moment(film.createdAt).format('DD/MM/YYYY'),
             updatedAt: moment(film.createdAt).format('DD/MM/YYYY')

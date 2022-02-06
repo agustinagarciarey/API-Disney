@@ -15,7 +15,7 @@ const schema = yup.object().shape({
         yup.object({
             name: yup.string()
         })
-    )
+    ).nullable(),
 });
 
 const UpdateFilm = async (req, res) => {
@@ -24,7 +24,7 @@ const UpdateFilm = async (req, res) => {
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
         console.log(request.data);
-        
+
         const genre = await Genre.findOne({
             where: {
                 id: request.data.genreId
@@ -33,7 +33,7 @@ const UpdateFilm = async (req, res) => {
         if (!genre) return new ErrorModel().newBadRequest(`El género ingresado no existe en el sistema`).send(res);
 
         let characters = [];
-        if (request.data.hasOwnProperty('characters')) {
+        if (request.data.characters != null) {
             for (const c of request.data.characters) {
                 const character = await Character.findOne({
                     where: {
@@ -55,13 +55,13 @@ const UpdateFilm = async (req, res) => {
         });
 
         console.log(film);
-
-        if (request.data.hasOwnProperty('characters')) {
+    //not found si no devuelve nada el update
+        if (request.data.characters != null) {
             for (const c of characters) {
                 await film.setCharacter(c.id);
             }
         }
-
+        
         return res.status(200).send({ message: "Película modificada con éxito" });
 
     } catch (err) {

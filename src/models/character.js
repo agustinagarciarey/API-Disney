@@ -27,7 +27,7 @@ module.exports = (sequelize, type) => {
 			required: true
 		},
 		weight: {
-			type: type.DECIMAL(5, 2),
+			type: type.FLOAT,
 			allowNull: false,
 			required: true
 		},

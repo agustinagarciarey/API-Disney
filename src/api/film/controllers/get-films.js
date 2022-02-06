@@ -11,7 +11,7 @@ const schema = yup.object().shape({
     genre: yup.string(),
 })
 
-const CreateFilm = async (req, res) => {
+const GetFilms = async (req, res) => {
     try {
         const request = await Validator(req.query, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
@@ -20,7 +20,7 @@ const CreateFilm = async (req, res) => {
             orderBy = order ? order : "ASC",
             Op = Sequelize.Op;
 
-        let films = {};
+        let films = [];
         //get by name
         if (name) {
             films = await Film.findAll({
@@ -55,14 +55,22 @@ const CreateFilm = async (req, res) => {
                 order: [['createdAt', orderBy]]
             });
         }
-
         //get all
         else {
             films = await Film.findAll({
-                order: [['createdAt', orderBy]]
+                order: [['createdAt', orderBy]],
+                attributes: ['title', 'imageURL', 'createdAt']
             });
-        }
 
+            films = films.map(f => {
+                f = {
+                    ...f.dataValues,
+                    createdAt: moment(f.createdAt).format('DD/MM/YYYY'),
+                }
+                return f;
+            })
+        }
+        /*
         const response = films.map(f => {
             f = {
                 ...f.dataValues,
@@ -71,12 +79,13 @@ const CreateFilm = async (req, res) => {
             }
             return f;
         })
+        */
 
-        return res.status(200).send(response);
+        return res.status(200).send(films);
 
     } catch (err) {
         return new ErrorModel().newInternalServerError(err.message).send(res);
     }
 };
 
-module.exports = CreateFilm;
+module.exports = GetFilms;
