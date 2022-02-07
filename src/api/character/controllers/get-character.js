@@ -15,10 +15,10 @@ const GetCharacter = async (req, res) => {
 
 
         let films = []
-        for (const f of character.films) {
+        for (const c of character.films) {
             const film = await Film.findOne({
                 where: {
-                    id: f.id
+                    id: c.id
                 }
             })
             films.push(film.title);

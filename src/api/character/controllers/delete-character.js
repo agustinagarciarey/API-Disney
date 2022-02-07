@@ -1,33 +1,33 @@
 const ErrorModel = require('../../../models/api-error');
-const { Character } = require('../../../db');
-const fs = require('fs-extra');
+const { Character, Film, CharactersFilms } = require('../../../db');
+const cloudinary = require('cloudinary');
 
 const DeleteCharacter = async (req, res) => {
+
     try {
-
-        const id = Number(req.query.id);
-        if (Number.isNaN(id)) return new ErrorModel().newBadRequest("ID incorrecto").send(res);
-
-        const character_exsists = await Character.findOne({
+        const character = await Character.findOne({
             where: {
-                id
-            }
+                id: req.params.id
+            },
+            include: [Film]
         });
-        if (!character_exsists) return new ErrorModel().newBadRequest("El personaje no existe").send(res);
+        if (!character) return new ErrorModel().newNotFound(`El personaje que se intenta eliminar no existe en el sistema`).send(res);
+        
+        await cloudinary.v2.uploader.destroy(character.imagePublicId);
 
-        const character = await models.User.destroy({
-            where: { id }
-        })
+        for (const f of character.dataValues.films) {
+            const association = await CharactersFilms.findOne({
+                where: {
+                    filmId: f.dataValues.id,
+                    characterId: req.params.id
+                }
+            })
+            association.destroy();
+        }
+        
+        character.destroy();
 
-        console.log(character);
-
-        await Character.create({
-            ...req.body,
-            image: req.file.path,
-            createdAt: moment.now(),
-        });
-
-        return res.status(200).send({ message: "Personaje creado con éxito" });
+        return res.status(200).send({ message: "Personaje eliminado con éxito" });
 
     } catch (err) {
         return new ErrorModel().newInternalServerError(err.message).send(res);

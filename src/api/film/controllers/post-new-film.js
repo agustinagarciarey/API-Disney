@@ -36,13 +36,6 @@ const CreateFilm = async (req, res) => {
         if (!genre) return new ErrorModel().newBadRequest(`El género no existe en el sistema`).send(res);
 
         let characters = [];
-        console.log(request.data)
-        console.log(request.data.characters)
-        if(request.data.characters == null) {
-            console.log("es nulo")
-        } else {
-            console.log("no es nulo")
-        }
         if (request.data.characters != null) {
             for (const c of request.data.characters) {
                 const character = await Character.findOne({
@@ -53,8 +46,6 @@ const CreateFilm = async (req, res) => {
                 if (!character) return new ErrorModel().newBadRequest(`El personaje ${c.name} no ha sido creado todavía. Cree primero el personaje para poder asociarlo a la película`).send(res);
                 characters.push(character);
             }
-
-            delete req.body.characters;
         }
 
         const result = await cloudinary.v2.uploader.upload(req.file.path);

@@ -1,9 +1,7 @@
 const ErrorModel = require('../../../models/api-error');
 const yup = require('yup');
 const Validator = require('../../../utils/validator');
-const { Genre } = require('../../../db');
-const { Film } = require('../../../db');
-const { Character } = require('../../../db');
+const { Genre, Film, Character } = require('../../../db');
 const moment = require("moment");
 
 const schema = yup.object().shape({
@@ -23,7 +21,12 @@ const UpdateFilm = async (req, res) => {
         const request = await Validator(req.body, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
-        console.log(request.data);
+        const film = await Film.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+        if (!film) return new ErrorModel().newNotFound(`La película o serie no existe en el sistema`).send(res);
 
         const genre = await Genre.findOne({
             where: {
@@ -43,25 +46,21 @@ const UpdateFilm = async (req, res) => {
                 if (!character) return new ErrorModel().newBadRequest(`El personaje ${c.name} no ha sido creado todavía. Cree primero el personaje para poder asociarlo a la película`).send(res);
                 characters.push(character);
             }
-
-            delete req.body.characters;
         }
 
-        const film = await Film.update({
+        await film.set({
             ...req.body,
             updatedAt: moment.now(),
-        }, {
-            where: {id: req.params.id}
         });
 
-        console.log(film);
-    //not found si no devuelve nada el update
-        if (request.data.characters != null) {
+        if (request.data.characters  != null) {
             for (const c of characters) {
-                await film.setCharacter(c.id);
+                await film.addCharacter(c.id);
             }
         }
-        
+
+        await film.save();
+
         return res.status(200).send({ message: "Película modificada con éxito" });
 
     } catch (err) {

@@ -1,6 +1,4 @@
 const ErrorModel = require('../../../models/api-error');
-const yup = require('yup');
-const Validator = require('../../../utils/validator');
 const { Character, CharactersFilms } = require('../../../db');
 const Sequelize = require('sequelize');
 
@@ -8,9 +6,6 @@ const GetCharacters = async (req, res) => {
     try {
         const { name, age, movies, weight} = req.query,
             Op = Sequelize.Op;
-
-        console.log(req.query)
-        console.log(movies)
 
         let characters = [];
         //get by name

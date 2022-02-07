@@ -21,6 +21,7 @@ const schema = yup.object().shape({
 
 const CreateCharacter = async (req, res) => {
     try {
+       
         const request = await Validator(req.body, schema);
         if (request.err) return new ErrorModel().newBadRequest(request.data).send(res);
 
@@ -40,13 +41,11 @@ const CreateCharacter = async (req, res) => {
                         title: f.title
                     }
                 });
-                console.log(film)
+
                 if (!film) return new ErrorModel().newBadRequest(`La película ${f.title} no ha sido creada todavía. Cree primero la película para poder asociarla a este personaje`).send(res);
                 films.push(film);
             }
         }
-
-        delete req.body.films;
 
         const result = await cloudinary.v2.uploader.upload(req.file.path);
 

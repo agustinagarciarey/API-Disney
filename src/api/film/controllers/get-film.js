@@ -5,8 +5,6 @@ const moment = require('moment');
 const GetFilm = async (req, res) => {
     try {
 
-        console.log(req.params.id)
-
         const film = await Film.findOne({
             where: {
                 id: req.params.id

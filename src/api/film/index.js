@@ -7,8 +7,7 @@ const UpdateFilm = require('./controllers/update-film')
 const DeleteFilm = require('./controllers/delete-film')
 const GetFilm = require('./controllers/get-film')
 const UpdateImage = require('./controllers/update-image')
-
-const CreateGenre = require('./controllers/genre')
+const CreateGenre = require('./controllers/post-new-genre')
 
 const router = express.Router();
 
@@ -19,7 +18,7 @@ router.put('/image/:id', CheckToken, multer.single('image'), UpdateImage);
 router.delete('/:id', CheckToken, DeleteFilm);
 router.get('/:id', CheckToken, CheckToken, GetFilm);
 
-//ELIMINAR ESTA RUTA
+
 router.post('/add/genre', CreateGenre);
 
 

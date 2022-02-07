@@ -25,11 +25,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BodySignupPost"
+              $ref: "#/components/schemas/BodySignup"
         required: true
       responses:
         200:
-          description: The user was created successfully
+          description: El usuario fue creado con éxito
           content:
             application/json:
               schema:
@@ -56,11 +56,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BodyLoginPost"
+              $ref: "#/components/schemas/BodyLogin"
         required: true
       responses:
         200:
-          description: The user was logged successfully
+          description: Éxito al iniciar sesión 
           content:
             application/json:
               schema:
@@ -94,7 +94,7 @@ paths:
         required: true
       responses:
         200:
-          description: The film was created successfully
+          description: La película o serie se creó con éxito
         400:
           $ref: "#/components/responses/BadRequest"
         401:
@@ -114,26 +114,27 @@ paths:
         in: query
         required: false
         description: Nombre de la película o serie
-        example: Star Wars Episode III Revenge of the Sith
+        example: Star Wars 
         schema:
           type: string
       - name: genre
         in: query
         required: false
-        description: Género de la película o serie
+        description: ID del Género de la película o serie
         example: 1
         schema:
-          type: string
+          type: number
       - name: order
         in: query
         required: false
         description: Orden para mostrar los datos según fecha de creación
-        example: ASC
+        example: DESC
         schema:
           type: string
+          enum: [ASC, DESC]
       responses:
         200:
-          description: (OK) Películas y series obtenidas con éxito
+          description: Películas y series obtenidas con éxito
           content:
             application/json:
               schema:
@@ -156,13 +157,13 @@ paths:
       - name: id
         in: path
         required: true
-        description: Movie ID
+        description: ID de la película o serie
         example: 1
         schema:
-          type: string
+          type: number
       responses:
         200:
-          description: (OK) Película o serie obtenida con éxito
+          description: Película o serie obtenida con éxito
           content:
             application/json:
               schema:
@@ -184,7 +185,7 @@ paths:
       - name: id
         in: path
         required: true
-        description: Movie ID
+        description: ID de la película o serie
         example: 1
         schema:
           type: string
@@ -196,7 +197,7 @@ paths:
         required: true
       responses:
         200:
-          description: (OK) Película o serie modificada con éxito
+          description: Película o serie modificada con éxito
         400:
           $ref: "#/components/responses/BadRequest"
         401:
@@ -216,13 +217,13 @@ paths:
       - name: id
         in: path
         required: true
-        description: Movie ID
+        description: ID de la película o serie
         example: 1
         schema:
           type: string
       responses:
         200:
-          description: (OK) Película o serie eliminada con éxito
+          description: Película o serie eliminada con éxito
         401:
           $ref: "#/components/responses/Unauthorized"
         404:
@@ -234,14 +235,14 @@ paths:
     put:
       tags:
         - Film
-      summary: Update image film
+      summary: Update image
       security:
         - userToken: []
       parameters:
       - name: id
         in: path
         required: true
-        description: Movie ID
+        description: ID de la película o serie
         example: 1
         schema:
           type: string
@@ -262,7 +263,7 @@ paths:
         required: true
       responses:
         200:
-          description: (OK) Película o serie modificada con éxito
+          description: Película o serie modificada con éxito
         400:
           $ref: "#/components/responses/BadRequest"
         401:
@@ -272,33 +273,240 @@ paths:
         500:
           $ref: "#/components/responses/ServerError"
           
+  /characters/add:
+    post:
+      tags:
+        - Character
+      summary: Create character
+      security:
+        - userToken: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BodyCreateCharacter"
+            encoding: 
+                image: 
+                  contentType: image/png, image/jpeg, image/jpg
+        required: true
+      responses:
+        200:
+          description: El personaje se creó con éxito
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        500:
+          $ref: "#/components/responses/ServerError"
+  
+  /characters:
+    get:
+      tags:
+        - Character
+      summary: Get characters
+      security:
+        - userToken: []
+      parameters:
+      - name: name
+        in: query
+        required: false
+        description: Nombre del personaje
+        example: Loki
+        schema:
+          type: string
+      - name: age
+        in: query
+        required: false
+        description: Edad del personaje
+        example: 8
+        schema:
+          type: number
+      - name: weight
+        in: query
+        required: false
+        description: Peso del personaje
+        example: 10
+        schema:
+          type: number
+      - name: movies
+        in: query
+        required: false
+        description: ID de Películas y series en las que participó
+        schema:
+          type: array
+          uniqueItems: true
+          items:
+            type: number
+          example:
+            - 2
+      responses:
+        200:
+          description: Películas y series obtenidas con éxito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseGetCharacters"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        500:
+          $ref: "#/components/responses/ServerError"
+          
+    
+  /characters/{id}:
+    get:
+      tags:
+        - Character
+      summary: Get character
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID del personaje
+        example: 1
+        schema:
+          type: string
+      responses:
+        200:
+          description: Personaje obtenido con éxito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseGetCharacter"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+    
+    put:
+      tags:
+        - Character
+      summary: Update character
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID del personaje
+        example: 1
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BodyUpdateCharacter"
+        required: true
+      responses:
+        200:
+          description: Personaje modificado con éxito
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+    
+    delete:
+      tags:
+        - Character
+      summary: Delete character
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID del personaje
+        example: 1
+        schema:
+          type: string
+      responses:
+        200:
+          description: Personaje eliminado con éxito
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
+          
+  /characters/image/{id}:
+    put:
+      tags:
+        - Character
+      summary: Update image
+      security:
+        - userToken: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID del personaje
+        example: 1
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+            encoding: 
+                image: 
+                  contentType: image/png, image/jpeg, image/jpg
+        required: true
+      responses:
+        200:
+          description: Personaje modificado con éxito
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/ServerError"
 components:
   securitySchemes:
     userToken:
       type: http
       scheme: bearer
-      description: To obtain the token please login
+      description: Para obtener el token inicie sesión o registre su usuario
 
   responses:
     Unauthorized:
-      description: Unauthorized user
+      description: Usuario no autorizado
 
     NotFound:
-      description: Data not found
+      description: Datos no encontrados
 
     BadRequest:
-      description: Error in data type or incomplete required fields
+      description: Error en el tipo de dato o campos incompletos
 
     ServerError:
-      description: Internal server error
+      description: Error interno del servidor
 
     EmailError:
-      description: Error sending email
+      description: Error en el envío de mail
     
 
 
   schemas:
-    BodySignupPost:
+    BodySignup:
       type: object
       required:
         - name
@@ -321,7 +529,7 @@ components:
           type: string
           example: Disney123
 
-    BodyLoginPost:
+    BodyLogin:
       type: object
       required:
         - mail
@@ -342,7 +550,6 @@ components:
         - year
         - rating
         - genreId
-        - characters
       properties:
         title:
           type: string
@@ -359,11 +566,12 @@ components:
           example: 4.7
         genreId:
           type: number
-          description: 1.Ciencia ficción 2.Drama 3.Comedia
+          description: 1.Ciencia ficción 2.Drama 3.Comedia 4.Acción
           example: 1
         characters:
           type: array
-          description: Enter characters already created. If they still do not exist, leave this field empty.
+          description: Enter character already created. If they still do not exist, leave this field empty.
+          uniqueItems: true
           items:
             type: object
             required:
@@ -373,7 +581,6 @@ components:
                 type: string
           example:
             - name: Anakin Skywalker
-            - name: Chewbacca
             
     BodyUpdateFilm:
       type: object
@@ -382,7 +589,6 @@ components:
         - year
         - rating
         - genreId
-        - characters
       properties:
         title:
           type: string
@@ -396,11 +602,12 @@ components:
           example: 4.7
         genreId:
           type: number
-          description: 1.Ciencia ficción 2.Drama 3.Comedia
+          description: 1.Ciencia ficción 2.Drama 3.Comedia 4.Acción
           example: 1
         characters:
           type: array
           description: Enter characters already created. If they still do not exist, leave this field empty.
+          uniqueItems: true
           items:
             type: object
             required:
@@ -410,7 +617,6 @@ components:
                 type: string
           example:
             - name: Anakin Skywalker
-            - name: Chewbacca
             
     ResponseGetFilm:
       type: object
@@ -424,8 +630,6 @@ components:
           format: binary
         imagePublicId:
           type: string
-        family:
-          type: number
         year:
           type: number
         rating:
@@ -443,9 +647,112 @@ components:
           type: string
         updatedAt:
           type: string
+        
           
     ResponseGetFilms:
       type: array
       items:
           $ref: '#/components/schemas/ResponseGetFilm'
           
+    BodyCreateCharacter:
+      type: object
+      required:
+        - name
+        - image
+        - age
+        - weight
+        - history
+      properties:
+        name:
+          type: string
+          maximum: 50
+          example: Loki Laufeyson
+        image:
+            type: string
+            format: binary
+        age:
+          type: number
+          example: 1020
+        weight:
+          type: number
+          example: 80.5
+        history:
+          type: string
+          example: Loki Laufeyson fue el hijo de Laufey, pero fue abandonado por este después de su nacimiento. Tras ser encontrado por el Rey de Asgard, Odín, Loki fue criado por la Familia Real Asgardiana junto con Thor. Él se ganó una reputación como el Dios de las Mentiras y organizó un plan para hacer que Odín destierre a Thor, convirtiéndose en el sucesor del trono de Asgard, mientras descubría su verdadero pasado. Loki tuvo éxito y asumió el trono cuando Odín cayó en el Sueño de Odín y decidió alistarse para destruir Jotunheim, sin embargo, como Thor fue ayudado por los Tres Guerreros a regresar a Asgard, Loki lo confrontó y, cuando sus planes fueron desaprobados por Odín, él se dejó caer al vacío durante el Duelo en el Puente Arcoíris.
+        films:
+          type: array
+          uniqueItems: true
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+          example:
+            - title: Loki
+
+            
+    ResponseGetCharacter:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        imageURL:
+          type: string
+          format: binary
+        imagePublicId:
+          type: string
+        age:
+          type: number
+        weight:
+          type: number
+        history:
+          type: string
+        films:
+          type: array
+          uniqueItems: true
+          items:
+            type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+          
+    ResponseGetCharacters:
+      type: array
+      items:
+          $ref: '#/components/schemas/ResponseGetCharacter'
+          
+    BodyUpdateCharacter:
+      type: object
+      required:
+        - name
+        - age
+        - weight
+        - history
+      properties:
+        name:
+          type: string
+          maximum: 50
+          example: Loki Laufeyson
+        age:
+          type: number
+          example: 1020
+        weight:
+          type: number
+          example: 80.5
+        history:
+          type: string
+          example: Loki Laufeyson fue el hijo de Laufey, pero fue abandonado por este después de su nacimiento. Tras ser encontrado por el Rey de Asgard, Odín, Loki fue criado por la Familia Real Asgardiana junto con Thor. Él se ganó una reputación como el Dios de las Mentiras y organizó un plan para hacer que Odín destierre a Thor, convirtiéndose en el sucesor del trono de Asgard, mientras descubría su verdadero pasado. Loki tuvo éxito y asumió el trono cuando Odín cayó en el Sueño de Odín y decidió alistarse para destruir Jotunheim, sin embargo, como Thor fue ayudado por los Tres Guerreros a regresar a Asgard, Loki lo confrontó y, cuando sus planes fueron desaprobados por Odín, él se dejó caer al vacío durante el Duelo en el Puente Arcoíris.
+        films:
+          type: array
+          uniqueItems: true
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+          example:
+            - title: Loki
+            - title: "Thor: The dark world"

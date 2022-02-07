@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-//const path = require('path');
 const userRoute = require('./api/user/index');
 const characterRoute = require('./api/character/index')
 const filmRoute = require('./api/film/index')
@@ -31,8 +30,6 @@ app.use('/movies', filmRoute);
 app.use('/characters', characterRoute);
 
 //starting the server
-app.listen(process.env.PORT || 3000, () =>{
+app.listen(process.env.PORT || 3000, () => {
 	console.log('Corriendo en el puerto ' + process.env.PORT);
 });
-
-//module.exports = { app, server };
