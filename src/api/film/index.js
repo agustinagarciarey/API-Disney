@@ -16,7 +16,7 @@ router.post('/add', CheckToken, multer.single('image'), CreateFilm);
 router.put('/:id', CheckToken, UpdateFilm);
 router.put('/image/:id', CheckToken, multer.single('image'), UpdateImage);
 router.delete('/:id', CheckToken, DeleteFilm);
-router.get('/:id', CheckToken, CheckToken, GetFilm);
+router.get('/:id', CheckToken, GetFilm);
 
 
 router.post('/add/genre', CreateGenre);
